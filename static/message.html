@@ -26,7 +26,7 @@
         <a href="/">
           <strong>Say Hello</strong>
         </a>
-        <small>to the world</small>
+        <small>to the world -> {{ data }}</small>
       </el-header>
       <el-main>
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-position="top" label-width="80px"
@@ -42,21 +42,21 @@
             <el-button type="primary" round plain @click="resetForm('ruleForm')">Reset</el-button>
           </el-form-item>
         </el-form>
-        <p class="total">{{messageTotal}} messages</p>
+        <p class="total">[[messageTotal]] messages</p>
         <div class="list-groups" v-for="message in messages">
           <div class="list-group">
             <div class="item-header">
-              {{message.name}}
+              [[message.name]]
               <small class="m-1">
-                #{{message.id}}
+                #[[message.id]]
               </small>
               <div>
                 <small class="m-2">
-                  {{message.create_at}}
+                  [[message.create_at]]
                 </small>
               </div>
             </div>
-            <p>{{message.body}}</p>
+            <p>[[message.body]]</p>
           </div>
         </div>
 
@@ -72,7 +72,7 @@
           Copyright© 2021 /&nbsp
         </div>
         <div v-for="link in links">
-          <a :href="link.url" target="_blank">{{link.name}}</a> /&nbsp
+          <a :href="link.url" target="_blank">[[link.name]]</a> /&nbsp
         </div>
 
       </el-footer>
@@ -88,6 +88,7 @@
 
     let app = new Vue({
       el: "#app",
+      delimiters: ['[[', ']]'],
       data: {
         messageTotal: 0,
         messages: [],

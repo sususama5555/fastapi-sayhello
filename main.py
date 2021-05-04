@@ -1,9 +1,15 @@
-from fastapi import FastAPI
+import json
+
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
 from sqlalchemy import func
 from starlette.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
 from schemas import *
 from db import session
+from logger import logger
 import models
 
 app = FastAPI(title="SayHello(留言板)",
@@ -16,11 +22,21 @@ app = FastAPI(title="SayHello(留言板)",
 # 设置跨域
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*",],
+    allow_origins=["*", ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+templates = Jinja2Templates(directory="static")
+
+
+@app.get("/", response_class=HTMLResponse)
+async def home(request: Request):
+    logger.info(request.query_params)
+    return templates.TemplateResponse("message.html", {"request": request, "data": "sapphire"})
 
 
 @app.get("/index", name="欢迎首页")
@@ -44,7 +60,7 @@ async def add_message(message: MessageCreate):
 async def get_messages(limit: int = 5, page: int = 1):
     # 统计条数
     total = session.query(func.count(models.Message.id)).scalar()
-    skip = (page - 1) * limit   # 计算当前页的起始数
+    skip = (page - 1) * limit  # 计算当前页的起始数
     # 倒序显示
     data = session.query(models.Message).order_by(models.Message.create_at.desc()).offset(skip).limit(limit).all()
     return ResponseList200(total=total, data=data)
